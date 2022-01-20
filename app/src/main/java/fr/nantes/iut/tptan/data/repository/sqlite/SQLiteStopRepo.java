@@ -1,5 +1,6 @@
 package fr.nantes.iut.tptan.data.repository.sqlite;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,10 +28,24 @@ public class SQLiteStopRepo {
         return stop;
     }
 
-    private Stop readRow( Cursor cursor ) {
+    @SuppressLint("Range")
+    private Stop readRow(Cursor cursor ) {
         Stop stop = new Stop();
+
         stop.setId(cursor.getString(0).substring(cursor.getString(0).indexOf(':')));
-        //TODO T101: Terminer la lecture du cursor
+
+        stop.setName(cursor.getString(1));
+        stop.setDesc(cursor.getString(2));
+        stop.setLat(cursor.getDouble(3));
+
+        stop.setLng(cursor.getDouble(4));
+        stop.setZoneId(cursor.getString(5));
+        stop.setStopUrl(cursor.getString(6));
+        stop.setLocationType(cursor.getInt(7));
+
+        stop.setParentStation(cursor.getString(8));
+        stop.setWheelChairBoarding(cursor.getInt(9));
+
         return stop;
     }
 }

@@ -3,17 +3,23 @@ package fr.nantes.iut.tptan.presentation;
 import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import fr.nantes.iut.tptan.R;
+import fr.nantes.iut.tptan.data.entity.Arret;
 import fr.nantes.iut.tptan.data.entity.ListArret;
 
 public class ProximityStopMapFragment extends Fragment implements OnMapReadyCallback, HomeActivity.ProximityStopListener {
@@ -59,18 +65,35 @@ public class ProximityStopMapFragment extends Fragment implements OnMapReadyCall
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        ((HomeActivity)context).registerProximityListener(this);
+        ((HomeActivity) context).registerProximityListener(this);
     }
 
     @Override
     public void onDetach() {
-        ((HomeActivity)getActivity()).unregisterProximityStopListener(this);
+        ((HomeActivity) getActivity()).unregisterProximityStopListener(this);
         super.onDetach();
     }
 
     @Override
     @SuppressWarnings({"MissingPermission"})
     public void onProximityStopChanged(ListArret arrets, Location location) {
-        //TODO T302: implémenter onProximityStopChanged
+        //TODO T302: implementer onProximityStopChanged
+        this.mMap.setMyLocationEnabled(true);//feature my location
+        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+        this.mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+
+
+        for (Arret a : arrets) {
+            if (a.getStop() != null) {
+                LatLng posStop = new LatLng(a.getStop().getLat(), a.getStop().getLng());
+                mMap.addMarker(new MarkerOptions()
+                        .position(posStop)
+                        .title(a.getLibelle())
+                        .snippet(a.getLignes().toString())
+                        .icon(BitmapDescriptorFactory.fromResource(
+                                R.drawable.busmarker
+                        )));
+            }
+        }
     }
 }

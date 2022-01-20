@@ -6,7 +6,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- TODO T201: Add permissions for localisation -->
-
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <!-- TODO T401: Add permissions for Camera -->
 

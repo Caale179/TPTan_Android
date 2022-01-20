@@ -5,6 +5,12 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
+
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -20,9 +26,10 @@ import java.util.List;
 
 import fr.nantes.iut.tptan.BuildConfig;
 import fr.nantes.iut.tptan.R;
+import fr.nantes.iut.tptan.data.entity.Arret;
 import fr.nantes.iut.tptan.data.entity.ListArret;
+import fr.nantes.iut.tptan.data.repository.sqlite.SQLiteStopRepo;
 import fr.nantes.iut.tptan.data.repository.tan.OpenDataTanRepo;
-
 public class HomeActivity extends AppCompatActivity {
 
     private static final int MY_PERMISSIONS_REQUEST_LOCATION = 1234;
@@ -37,7 +44,11 @@ public class HomeActivity extends AppCompatActivity {
 
     private boolean mAskingPermission = false;
 
-    private Location mCurrentLocation ;
+    private Location mCurrentLocation;
+
+    private LocationCallback mLocationCallback;
+
+    private FusedLocationProviderClient mFusedLocationClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,8 +95,21 @@ public class HomeActivity extends AppCompatActivity {
     private void initLocationService() {
 
         //TODO T202: Initialise le provider de localisation et son callback
-        //TODO T203: Instancier et configurer la variable mLocationRequest.
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        mLocationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                onLocationChanged(locationResult.getLastLocation());
+            }
+        };
+
+        //TODO T203: Instancier et configurer la variable mLocationRequest.
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(15000);
+        mLocationRequest.setFastestInterval(10000);
+        mLocationRequest.setSmallestDisplacement((float) 10);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     @Override
@@ -136,6 +160,15 @@ public class HomeActivity extends AppCompatActivity {
             mRequestingLocationUpdates = true;
 
             //TODO T204
+            if (mCurrentLocation == null) {
+                mFusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        onLocationChanged(location);
+                    }
+                });
+            }
+            mFusedLocationClient.requestLocationUpdates(mLocationRequest, mLocationCallback, null);
         }
     }
 
@@ -149,38 +182,40 @@ public class HomeActivity extends AppCompatActivity {
      */
     private void stopLocationUpdates() {
         //TODO T205
+        mFusedLocationClient.removeLocationUpdates(mLocationCallback);
         mRequestingLocationUpdates = false;
     }
 
-    public void registerProximityListener( ProximityStopListener proximityStopListener ) {
+    public void registerProximityListener(ProximityStopListener proximityStopListener) {
         this.mProximityStopListeners.add(proximityStopListener);
     }
 
-    public void unregisterProximityStopListener( ProximityStopListener proximityStopListener ) {
+    public void unregisterProximityStopListener(ProximityStopListener proximityStopListener) {
         this.mProximityStopListeners.remove(proximityStopListener);
     }
 
-    private void notifyListeners( ListArret arrets, Location location ) {
-        for( ProximityStopListener proximityStopListener : mProximityStopListeners ) {
-            proximityStopListener.onProximityStopChanged( arrets, location );
+    private void notifyListeners(ListArret arrets, Location location) {
+        for (ProximityStopListener proximityStopListener : mProximityStopListeners) {
+            proximityStopListener.onProximityStopChanged(arrets, location);
         }
     }
 
     public interface ProximityStopListener {
 
-        void onProximityStopChanged( ListArret arrets, Location location );
+        void onProximityStopChanged(ListArret arrets, Location location);
     }
 
     /**
      * AsyncTask.
      */
-    public class ProximityStopAsyncTask extends AsyncTask<Location,Void,ListArret> {
+    public class ProximityStopAsyncTask extends AsyncTask<Location, Void, ListArret> {
 
         private Location mLocation;
 
         @Override
         protected ListArret doInBackground(Location... location) {
-            ListArret listArrets = null ;
+            ListArret listArrets = null;
+            SQLiteStopRepo sqLiteStopRepo = new SQLiteStopRepo();
             try {
                 this.mLocation = location[0];
 
@@ -191,16 +226,19 @@ public class HomeActivity extends AppCompatActivity {
                         HomeActivity.this.getApplicationContext());
 
                 //TODO T102
+                for (Arret a : listArrets) {
+                    a.setStop(sqLiteStopRepo.getStop(a.getCodeLieu(), HomeActivity.this.getApplicationContext()));
+                }
 
-            } catch( Exception exception ) {
+            } catch (Exception exception) {
                 Log.e(BuildConfig.LOG_TAG, "Error", exception);
             }
-            return listArrets ;
+            return listArrets;
         }
 
         @Override
         protected void onPostExecute(ListArret listArrets) {
-            HomeActivity.this.notifyListeners( listArrets, this.mLocation);
+            HomeActivity.this.notifyListeners(listArrets, this.mLocation);
         }
     }
 }
