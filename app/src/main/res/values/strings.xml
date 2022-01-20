@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">TPTan</string>
+    <string name="error_connectionfailed">Echec de connection au service</string>
+    <string name="title_activity_arret_maps">Map</string>
+    <string name="tan_url" translatable="false">http://open.tan.fr"</string>
+
+    <string name="title_activity_home">TAN - TODO T001 : Nom/Prénom</string>
+
+</resources>

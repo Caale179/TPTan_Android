@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp">
+
+    <ImageView
+        android:id="@+id/arretproche_icon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        style="@style/TextAppearance.AppCompat.Body1"
+        tools:text="Icon"/>
+
+    <TextView
+        android:id="@+id/arretproche_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        style="@style/TextAppearance.AppCompat.Body1"
+        tools:text="Distance"/>
+
+    <TextView
+        android:id="@+id/arretproche_libellelieu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@id/arretproche_icon"
+        android:layout_toEndOf="@id/arretproche_icon"
+        android:layout_toLeftOf="@id/arretproche_distance"
+        android:layout_toStartOf="@id/arretproche_distance"
+        style="@style/TextAppearance.AppCompat.Title"
+        tools:text="Libelle Lieu"/>
+
+    <ImageView
+        android:id="@+id/arretproche_navigate"
+        android:layout_width="48dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/arretproche_distance"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        style="@style/TextAppearance.AppCompat.Body1"
+        tools:text="Carte"/>
+
+    <LinearLayout
+        android:paddingTop="5dp"
+        android:id="@+id/arretproche_lignes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/arretproche_icon"
+        android:orientation="horizontal">
+    </LinearLayout>
+
+</RelativeLayout>
